@@ -5,10 +5,6 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"; 
 
-// write one controller for deleliting the old avatar or coverImage which is on Cloudinary
-// we're just updating and adding new file to cloudinary and not deleting it so, make a small utility function and update the 
-// controller's according to it
-
 const generateAccessAndRefreshToken = async function (userId) {
     try {
         const user = await User.findById(userId);
@@ -194,7 +190,7 @@ const logOutUser = asyncHandler(async function(req, res) {
 });
 
 const refreshAccessToken = asyncHandler( async function ( req, res) {
-    const incommingRefreshToken = req.cookie.refreshToken || req.body.refreshToken;
+    const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!incommingRefreshToken) {
         throw new ApiError(401, "Unauthorized request !");
@@ -236,7 +232,7 @@ const refreshAccessToken = asyncHandler( async function ( req, res) {
     }
 });
 
-const changeCurrentPassword = asyncHandler( async function ( req, res) {
+const updateCurrentPassword = asyncHandler( async function ( req, res) {
     const { oldPassword, newPassword } = req.body;
 
     const user = await User.findById(req.user._id);
@@ -360,7 +356,7 @@ export {
     loginUser,
     logOutUser,
     refreshAccessToken,
-    changeCurrentPassword,
+    updateCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
