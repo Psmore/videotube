@@ -2,7 +2,9 @@ import { Router } from "express";
 import { registerUser,
     loginUser,
     logOutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    updateUserAvatar,
+    updateUserCoverImage
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { varifyJWT } from "../middlewares/auth.middleware.js";
@@ -21,8 +23,12 @@ router.route('/register').post(
 router.route("/login").post(loginUser)
 
 //secure routes
-router.route("/logout").post(varifyJWT, logOutUser)
-router.route("/refresh-token").post(refreshAccessToken)
+router.route("/logout").post(varifyJWT, logOutUser);
+router.route("/refresh-token").post(refreshAccessToken);
+router.route("/update-avatar").post(varifyJWT, upload.single("avatar"),
+updateUserAvatar);
+router.route("/update-coverImage").post(varifyJWT, upload.single("coverImage"),
+updateUserCoverImage);
 
 
 export default router;

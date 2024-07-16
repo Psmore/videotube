@@ -1,8 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import dotenv from "dotenv";
-import { ApiError } from "./ApiError.js";
-dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -27,21 +24,19 @@ const uploadOnCloudinary = async function(localFilePath) {
     } catch (error) {
         fs.unlinkSync(localFilePath); //remove the locally saved temporary file
         //as upload operation got failed
+        console.log(error.message);
         return null;
     }
 }
 
+// deleting image fron cloudinary
 const deleteFromCloudinary = async function(cloudinaryFilePath) {
     try {
         if (!cloudinaryFilePath) return null;
-
-        const response = await cloudinary.uploader.destroy(
-            cloudinaryFilePath,
-            function(result) {
-                console.log(result)
-            }
-        );
-        console.log(response);
+        const urlArray = cloudinaryFilePath.split("/");
+        const Image = urlArray[urlArray.length - 1];
+        const ImageName = Image.split(".")[0];
+        await cloudinary.uploader.destroy(ImageName, { resource_type: "image"});
     } catch (error) {
         console.log(error);
     }
