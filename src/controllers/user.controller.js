@@ -55,13 +55,6 @@ const registerUser = asyncHandler( async function (req, res) {
     let avatarLocalPath;    
     avatarLocalPath = req.files?.avatar[0].path;
 
-    
-    // here i occured error in which when i'm extracting file values from req.file it's getting undefined
-    // so i used different middleware's, reconstruct the controller, cludinary util and multer middleware
-    // but i'm getting error constantly 
-    // while doing this i'm using the postman extension in vs code then i installed postman locally and 
-    // all error get solve and known that the error was in extension.
-
     let coverImageLocalPath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path;
@@ -99,7 +92,17 @@ const registerUser = asyncHandler( async function (req, res) {
         throw new ApiError(500, "Something went wrong while registering the user");
     }
 
-    return res.status(201).json(
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+    const { accessToken, refreshToken} = generateAccessAndRefreshToken(createdUser._id);
+
+    return res
+    .status(201)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
         new ApiResponse(200, createdUser, "User registered Successfully")
     );
 
@@ -351,6 +354,42 @@ const updateUserCoverImage = asyncHandler( async function (req, res) {
     );
 });
 
+const deleteUser = asyncHandler( async function (req, res) {
+    // finding the current user
+    const user = await User.findById(req.user._id);
+    // checking password
+    const password = req.body.password;
+    if (!password) {
+        throw new ApiError(400, "Password is required !!")
+    }
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+    if (!isPasswordCorrect) {
+        throw new ApiError(400, "Invalid Password !!");
+    }
+    // deleting user images from cloudinary
+    const avatarUrl = user.avatar;
+    const coverImageUrl = user.coverImage;
+    await deleteFromCloudinary(avatarUrl).catch(e => console.log(e.message));
+    await deleteFromCloudinary(coverImageUrl).catch(e => console.log(e.message));
+    // deleling user from database
+    await User.findByIdAndDelete(user._id).catch((error) => {
+        throw new ApiError(500, "Internal Server error occured while deleting user", error.message);
+    });
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+        new ApiResponse(200, {}, "User Deleted Successfully")
+    );  
+});
+
 export {
     registerUser,
     loginUser,
@@ -360,6 +399,7 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    deleteUser
 
 };

@@ -7,7 +7,8 @@ import { registerUser,
     updateUserCoverImage,
     updateAccountDetails,
     updateCurrentPassword,
-    getCurrentUser
+    getCurrentUser,
+    deleteUser
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { varifyJWT } from "../middlewares/auth.middleware.js";
@@ -35,4 +36,8 @@ updateUserCoverImage);
 router.route("/update-accountDetails").post(varifyJWT, updateAccountDetails);
 router.route("/update-password").post(varifyJWT, updateCurrentPassword);
 router.route("/get-currentUser").get(varifyJWT, getCurrentUser);
+
+// deleting user
+router.route("/deleteUser").post(varifyJWT, deleteUser);
+
 export default router;
