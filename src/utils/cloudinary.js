@@ -42,5 +42,21 @@ const deleteFromCloudinary = async function(cloudinaryFilePath) {
     }
 }
 
+//const uploadVideoOnCloudinary = async function(localVideoFilePath) {
+//    try {
+//        if (!localVideoFilePath) return null;
+//        const response = await cloudinary.uploader.upload(
+//            localVideoFilePath,
+//            { resource_type: "video"}
+//        );
+//        fs.unlinkSync(localVideoFilePath);
+//        return response;
+//    }
+//    catch (error) {
+//        fs.unlinkSync(localVideoFilePath);
+//        console.error(error.message);
+//    }
+//}
+
 export { uploadOnCloudinary, deleteFromCloudinary }
 

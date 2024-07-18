@@ -8,7 +8,9 @@ import { registerUser,
     updateAccountDetails,
     updateCurrentPassword,
     getCurrentUser,
-    deleteUser
+    deleteUser,
+    getUserChannelProfile,
+    getUserWatchHistory
  } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { varifyJWT } from "../middlewares/auth.middleware.js";
@@ -39,5 +41,9 @@ router.route("/get-currentUser").get(varifyJWT, getCurrentUser);
 
 // deleting user
 router.route("/deleteUser").post(varifyJWT, deleteUser);
+
+// userchannel
+router.route("/c/:username").get(varifyJWT, getUserChannelProfile);
+router.route("/history").get(varifyJWT, getUserWatchHistory);
 
 export default router;
